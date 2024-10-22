@@ -19,8 +19,13 @@ export class Name {
     private components: string[] = [];
 
     /** Expects that all Name components are properly masked */
+    // mutation method: initialization
+    // convenience: constructor
     constructor(other: string[], delimiter?: string) {
-        throw new Error("needs implementation");
+        this.components = other;
+        if (delimiter !== undefined) {
+            this.delimiter = delimiter;
+        }
     }
 
     /**
@@ -28,8 +33,17 @@ export class Name {
      * Control characters are not escaped (creating a human-readable string)
      * Users can vary the delimiter character to be used
      */
+    // query method: conversion
+    // implemenation: composed
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation");
+        let name: string = "";
+        for (let i = 0; i < this.components.length; i++) {
+            if (i != 0) {
+                name += delimiter; // append the delimiter before the next component (not before the first)
+            }
+            name += this.components[i]; // always append the next component
+        }
+        return name;
     }
 
     /** 
@@ -41,32 +55,44 @@ export class Name {
         throw new Error("needs implementation");
     }
 
+    // query method: getter
+    // implemenation: primitive
     public getComponent(i: number): string {
-        throw new Error("needs implementation");
+        return this.components[i];
     }
 
     /** Expects that new Name component c is properly masked */
+    // mutation method: setter
+    // implemenation: primitive
     public setComponent(i: number, c: string): void {
-        throw new Error("needs implementation");
+        this.components[i] = c;
     }
 
      /** Returns number of components in Name instance */
-     public getNoComponents(): number {
-        throw new Error("needs implementation");
+     // query method: getter
+    // implemenation: primitive
+    public getNoComponents(): number {
+        return this.components.length; // who in their right mind would call this NoComponents? Call it getNumberOf.. or getComponentCount
     }
 
     /** Expects that new Name component c is properly masked */
+    // mutation method: command
+    // implemenation: primitive??
     public insert(i: number, c: string): void {
-        throw new Error("needs implementation");
+        this.components.splice(i, 0, c); // insert the component at the i-th position and push the rest back
     }
 
     /** Expects that new Name component c is properly masked */
+    // mutation method: command
+    // implemenation: primitive??
     public append(c: string): void {
-        throw new Error("needs implementation");
+        this.components.push(c); // add the component to the end
     }
 
+    // mutation method: command
+    // implemenation: primitive??
     public remove(i: number): void {
-        throw new Error("needs implementation");
+        this.components.splice(i, 1); // remove the i-th component
     }
 
 }
