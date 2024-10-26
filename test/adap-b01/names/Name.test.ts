@@ -33,3 +33,14 @@ describe("Escape character extravaganza", () => {
     expect(n.asString()).toBe("oss.cs.fau.de#people");
   });
 });
+
+// More tests
+describe("Test escape character", () => {
+  it("test escape and delimiter boundary conditions", () => {
+    // Original name string = "oss.cs.fau.de"
+    let n: Name = new Name(["oss.cs.fau.de"], '.');
+    expect(n.asNameString()).toBe("oss.cs.fau.de");
+    n.append("people");
+    expect(n.asNameString()).toBe("oss\\.cs\\.fau\\.de.people");
+  });
+});

@@ -19,8 +19,8 @@ export class Name {
     private components: string[] = [];
 
     /** Expects that all Name components are properly masked */
-    // mutation method: initialization
-    // convenience: constructor
+    // @methodtype mutation method: initialization
+    // @methodtype convenience: constructor
     constructor(other: string[], delimiter?: string) {
         this.components = other;
         if (delimiter !== undefined) {
@@ -33,15 +33,16 @@ export class Name {
      * Control characters are not escaped (creating a human-readable string)
      * Users can vary the delimiter character to be used
      */
-    // query method: conversion
-    // implemenation: composed
+    // @methodtype query method: conversion
+    // @methodtype implemenation: composed
     public asString(delimiter: string = this.delimiter): string {
         let name: string = "";
         for (let i = 0; i < this.components.length; i++) {
             if (i != 0) {
                 name += delimiter; // append the delimiter before the next component (not before the first)
             }
-            name += this.components[i]; // always append the next component
+            name += this.components[i].replaceAll(delimiter, ESCAPE_CHARACTER + delimiter); // always append the next component
+            // if a component contains the delimiter, escape it with the escape character before appending it
         }
         return name;
     }
@@ -55,42 +56,42 @@ export class Name {
         throw new Error("needs implementation");
     }
 
-    // query method: getter
-    // implemenation: primitive
+    // @methodtype query method: getter
+    // @methodtype implemenation: primitive
     public getComponent(i: number): string {
         return this.components[i];
     }
 
     /** Expects that new Name component c is properly masked */
-    // mutation method: setter
-    // implemenation: primitive
+    // @methodtype mutation method: setter
+    // @methodtype implemenation: primitive
     public setComponent(i: number, c: string): void {
         this.components[i] = c;
     }
 
-     /** Returns number of components in Name instance */
-     // query method: getter
-    // implemenation: primitive
+    /** Returns number of components in Name instance */
+    // @methodtype query method: getter
+    // @methodtype implemenation: primitive
     public getNoComponents(): number {
         return this.components.length; // who in their right mind would call this NoComponents? Call it getNumberOf.. or getComponentCount
     }
 
     /** Expects that new Name component c is properly masked */
-    // mutation method: command
-    // implemenation: primitive??
+    // @methodtype mutation method: command
+    // @methodtype implemenation: primitive??
     public insert(i: number, c: string): void {
         this.components.splice(i, 0, c); // insert the component at the i-th position and push the rest back
     }
 
     /** Expects that new Name component c is properly masked */
-    // mutation method: command
-    // implemenation: primitive??
+    // @methodtype mutation method: command
+    // @methodtype implemenation: primitive??
     public append(c: string): void {
         this.components.push(c); // add the component to the end
     }
 
-    // mutation method: command
-    // implemenation: primitive??
+    // @methodtype mutation method: command
+    // @methodtype implemenation: primitive??
     public remove(i: number): void {
         this.components.splice(i, 1); // remove the i-th component
     }
