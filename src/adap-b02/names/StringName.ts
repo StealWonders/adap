@@ -5,42 +5,47 @@ export class StringName implements Name {
 
     protected delimiter: string = DEFAULT_DELIMITER;
     protected name: string = "";
-    protected noComponents: number = 0;
+    protected noComponents: number = 0; // probably number of components?
 
     constructor(other: string, delimiter?: string) {
-        throw new Error("needs implementation");
+        if (delimiter !== undefined) this.delimiter = delimiter;
+        this.name = other;
+        this.noComponents = other.split(this.delimiter).length;
     }
 
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation");
+        return this.name; // todo!!!
     }
 
     public asDataString(): string {
         throw new Error("needs implementation");
     }
 
-    public getDelimiterCharacter(): string {
-        throw new Error("needs implementation");
+    public isEmpty(): boolean {
+        return this.noComponents === 0;
     }
 
-    public isEmpty(): boolean {
-        throw new Error("needs implementation");
+    public getDelimiterCharacter(): string {
+        return this.delimiter;
     }
 
     public getNoComponents(): number {
-        throw new Error("needs implementation");
+        return this.noComponents;
     }
 
     public getComponent(x: number): string {
-        throw new Error("needs implementation");
+        if (x < 0 || x >= this.length) throw new Error("index out of bounds");
+        return this.name.split(this.delimiter)[x]; // todo!!!
     }
 
     public setComponent(n: number, c: string): void {
-        throw new Error("needs implementation");
+        if (n < 0 || n >= this.noComponents) throw new Error("index out of bounds");
+        // todo!!!
     }
 
     public insert(n: number, c: string): void {
-        throw new Error("needs implementation");
+        if (n < 0 || n >= this.noComponents) throw new Error("index out of bounds");
+        // todo!!!
     }
 
     public append(c: string): void {
