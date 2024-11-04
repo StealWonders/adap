@@ -11,20 +11,14 @@ export class StringArrayName implements Name {
         this.components = other;
     }
 
+    // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
-        let name: string = "";
-        for (let i = 0; i < this.components.length; i++) {
-            if (i != 0) {
-                name += delimiter; // append the delimiter before the next component (not before the first)
-            }
-            name += this.components[i].replaceAll(delimiter, ESCAPE_CHARACTER + delimiter); // always append the next component
-            // if a component contains the delimiter, escape it with the escape character before appending it
-        }
-        return name;
+        return this.components.map((component) => component.replace(new RegExp(`\\\\${delimiter}`, 'g'), delimiter)).join(delimiter);
     }
 
+    // join the components with the default delimiter so that the Name can be parsed back in from the string
     public asDataString(): string {
-        throw new Error("needs implementation");
+        return this.components.join(DEFAULT_DELIMITER);
     }
 
     public isEmpty(): boolean {
@@ -40,29 +34,45 @@ export class StringArrayName implements Name {
     }
 
     public getComponent(i: number): string {
+        this.checkBounds(i);
         return this.components[i];
     }
 
     public setComponent(i: number, c: string): void {
+        this.checkBounds(i);
+        this.checkForUnescapedDelimiter(c);
         this.components[i] = c;
     }
 
     public insert(i: number, c: string): void {
+        this.checkBounds(i);
+        this.checkForUnescapedDelimiter(c);
         this.components.splice(i, 0, c); // insert the component at the i-th position and push the rest back
     }
 
     public append(c: string): void {
+        this.checkForUnescapedDelimiter(c);
         this.components.push(c); // append the component at the end
     }
 
     public remove(i: number): void {
+        this.checkBounds(i);
         this.components.splice(i, 1); // remove the i-th component
     }
 
     public concat(other: Name): void {
+        if (this.delimiter !== other.getDelimiterCharacter()) throw new Error("delimiters do not match");
         for (let i = 0; i < other.getNoComponents(); i++) {
             this.components.push(other.getComponent(i));
         }
+    }
+
+    private checkBounds(i: number): void {
+        if (i < 0 || i >= this.components.length) throw new Error("index out of bounds");
+    }
+
+    private checkForUnescapedDelimiter(c: string): void {
+        if (c.includes(this.delimiter)) throw new Error("String contains unescaped delimiter characters");
     }
 
 }
