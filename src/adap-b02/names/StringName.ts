@@ -16,7 +16,7 @@ export class StringName implements Name {
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
         return this.name
-            .replaceAll(new RegExp(`\\${ESCAPE_CHARACTER}${delimiter}`, 'g'), delimiter)
+            .replaceAll(this.getUnescaptedDelimiterRegex(), delimiter)
             .replaceAll(ESCAPE_CHARACTER, "");
     }
 

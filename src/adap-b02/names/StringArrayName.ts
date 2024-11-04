@@ -15,7 +15,7 @@ export class StringArrayName implements Name {
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
         return this.components.map((component) => component
-            .replaceAll(new RegExp(`\\${ESCAPE_CHARACTER}${delimiter}`, 'g'), delimiter)
+            .replaceAll(this.getUnescaptedDelimiterRegex(), delimiter)
             .replaceAll(ESCAPE_CHARACTER, ""))
             .join(delimiter);
     }
@@ -77,6 +77,10 @@ export class StringArrayName implements Name {
 
     private checkForUnescapedDelimiter(c: string): void {
         if (c.includes(this.delimiter)) throw new Error("String contains unescaped delimiter characters");
+    }
+
+    private getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
+        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})\\${this.delimiter}`, 'g');
     }
 
 }
