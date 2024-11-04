@@ -7,13 +7,17 @@ export class StringArrayName implements Name {
     protected components: string[] = [];
 
     constructor(other: string[], delimiter?: string) {
+        if (other.length == 0) throw new Error("Name must have at least one component");
         if (delimiter !== undefined) this.delimiter = delimiter;
         this.components = other;
     }
 
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
-        return this.components.map((component) => component.replace(new RegExp(`\\\\${delimiter}`, 'g'), delimiter)).join(delimiter);
+        return this.components.map((component) => component
+            .replaceAll(new RegExp(`\\${ESCAPE_CHARACTER}${delimiter}`, 'g'), delimiter)
+            .replaceAll(ESCAPE_CHARACTER, ""))
+            .join(delimiter);
     }
 
     // join the components with the default delimiter so that the Name can be parsed back in from the string

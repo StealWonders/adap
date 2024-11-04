@@ -10,15 +10,14 @@ export class StringName implements Name {
     constructor(other: string, delimiter?: string) {
         if (delimiter !== undefined) this.delimiter = delimiter;
         this.name = other;
-
-        // regex that matches the delimiter not preceded by the escape character
-        const delimiterWithoutEscapeRegex = new RegExp(`(?<!\\${ESCAPE_CHARACTER})\${this.delimiter}`, 'g');
-        this.noComponents = other.split(delimiterWithoutEscapeRegex).length; // count the number of components
+        this.noComponents = other.split(this.getUnescaptedDelimiterRegex(delimiter)).length; // count the number of components
     }
 
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
-        return this.name.replace(new RegExp(`\\${ESCAPE_CHARACTER}${delimiter}`, 'g'), delimiter);
+        return this.name
+            .replaceAll(new RegExp(`\\${ESCAPE_CHARACTER}${delimiter}`, 'g'), delimiter)
+            .replaceAll(ESCAPE_CHARACTER, "");
     }
 
     // join the components with the default delimiter so that the Name can be parsed back in from the string
@@ -47,15 +46,13 @@ export class StringName implements Name {
     public setComponent(n: number, newComponent: string): void {
         this.checkBounds(n);
         this.checkForUnescapedDelimiter(newComponent);
-        // this.name = this.name.split(this.delimiter).map((originalComponent, idx) => idx === n ? newComponent : originalComponent).join(this.delimiter);
-        // const regex = new RegExp(`(?<!\\\\)\\${this.delimiter}`, 'g');
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components[n] = newComponent;
         this.name = components.join(this.delimiter);
     }
 
     public insert(n: number, newComponent: string): void {
-        // this.checkBounds(n); // test requires this to be commented out
+        this.checkBounds(n);
         this.checkForUnescapedDelimiter(newComponent);
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components.splice(n, 0, newComponent);
@@ -92,8 +89,8 @@ export class StringName implements Name {
         if (c.includes(this.delimiter)) throw new Error("String contains unescaped delimiter characters");
     }
 
-    private getUnescaptedDelimiterRegex(): RegExp {
-        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})\${this.delimiter}`, 'g');
+    private getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
+        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})\\${this.delimiter}`, 'g');
     }
 
 }
