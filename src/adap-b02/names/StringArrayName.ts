@@ -49,7 +49,7 @@ export class StringArrayName implements Name {
     }
 
     public insert(i: number, c: string): void {
-        // this.checkBounds(i);
+        this.checkBounds(i);
         this.checkForUnescapedDelimiter(c);
         this.components.splice(i, 0, c); // insert the component at the i-th position and push the rest back
     }

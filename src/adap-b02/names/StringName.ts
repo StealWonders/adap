@@ -53,7 +53,7 @@ export class StringName implements Name {
     }
 
     public insert(n: number, newComponent: string): void {
-        // this.checkBounds(n);
+        this.checkBounds(n);
         this.checkForUnescapedDelimiter(newComponent);
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components.splice(n, 0, newComponent);
