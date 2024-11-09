@@ -13,16 +13,17 @@ export class StringName implements Name {
         this.noComponents = other.split(this.getUnescaptedDelimiterRegex(delimiter)).length; // count the number of components
     }
 
+    // todo: escapted escape-characters are not handled correctly
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
-        return this.name
-            .replaceAll(this.getUnescaptedDelimiterRegex(), delimiter)
-            .replaceAll(ESCAPE_CHARACTER, "");
+        return this.name.replaceAll(this.getUnescaptedDelimiterRegex(), delimiter)
+            .replaceAll(ESCAPE_CHARACTER + ESCAPE_CHARACTER, ESCAPE_CHARACTER)
+            .replaceAll(ESCAPE_CHARACTER + this.delimiter, this.delimiter)
     }
 
     // join the components with the default delimiter so that the Name can be parsed back in from the string
     public asDataString(): string {
-        return this.name;
+        return this.name.replaceAll(this.getUnescaptedDelimiterRegex(), DEFAULT_DELIMITER);
     }
 
     public isEmpty(): boolean {
@@ -52,7 +53,7 @@ export class StringName implements Name {
     }
 
     public insert(n: number, newComponent: string): void {
-        this.checkBounds(n);
+        // this.checkBounds(n);
         this.checkForUnescapedDelimiter(newComponent);
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components.splice(n, 0, newComponent);
@@ -68,7 +69,6 @@ export class StringName implements Name {
 
     public remove(n: number): void {
         this.checkBounds(n);
-        // this.name = this.name.split(this.delimiter).filter((_, idx) => idx !== n).join(this.delimiter);
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components.splice(n, 1);
         this.name = components.join(this.delimiter);
@@ -86,11 +86,17 @@ export class StringName implements Name {
     }
 
     private checkForUnescapedDelimiter(c: string): void {
-        if (c.includes(this.delimiter)) throw new Error("String contains unescaped delimiter characters");
+        if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new Error("String contains unescaped delimiter characters");
     }
 
     private getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
-        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})\\${this.delimiter}`, 'g');
+        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g'); // todo: make this escape escape-characters
+        
+        // all not correctly escaped delimiters
+        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER})(?:\\\\\\\\)*[${this.delimiter}]`, 'g');
+        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER})(\\${ESCAPE_CHARACTER}\\${ESCAPE_CHARACTER})*[${this.delimiter}]`, 'g');
+        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER}|(?:\\${ESCAPE_CHARACTER}{2})*\\${ESCAPE_CHARACTER})[${delimiter}]`, 'g');    
+        // return new RegExp(`(?<=(^|[^\\${ESCAPE_CHARACTER}]|(?:\\${ESCAPE_CHARACTER}{2})+))[${delimiter}]`, 'g');
     }
 
 }
