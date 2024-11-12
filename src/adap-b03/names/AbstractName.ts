@@ -26,7 +26,9 @@ export abstract class AbstractName implements Name {
     public asString(delimiter: string = this.delimiter): string {
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
-            result += this.getComponent(i);
+            result += this.getComponent(i)
+                .replaceAll(ESCAPE_CHARACTER + ESCAPE_CHARACTER, ESCAPE_CHARACTER) // Unescape escape characters
+                .replaceAll(ESCAPE_CHARACTER + this.delimiter, this.delimiter); // Unescape the delimiter
             if (i < this.getNoComponents() - 1) result += delimiter;
         }
         return result;
@@ -46,11 +48,19 @@ export abstract class AbstractName implements Name {
     // todo: escapted escape-characters are not handled correctly
     // join the components with the default delimiter so that the Name can be parsed back in from the string
     public asDataString(): string {
+        if (this.delimiter === DEFAULT_DELIMITER) {  // If the delimiter is the default delimiter, no need to escape it
+            let result = "";
+            for (let i = 0; i < this.getNoComponents(); i++) {
+                result += this.getComponent(i);
+                if (i < this.getNoComponents() - 1) result += DEFAULT_DELIMITER;
+            }
+            return result;
+        }
+
+        // If the delimiter is not the default delimiter, escape the default delimiter
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
-            result += this.getComponent(i)
-                .replaceAll(ESCAPE_CHARACTER + this.delimiter, this.delimiter)
-                .replaceAll(ESCAPE_CHARACTER + ESCAPE_CHARACTER, ESCAPE_CHARACTER);
+            result += this.getComponent(i).replaceAll(ESCAPE_CHARACTER + this.delimiter, this.delimiter);
             if (i < this.getNoComponents() - 1) result += DEFAULT_DELIMITER;
         }
         return result;
@@ -93,7 +103,15 @@ export abstract class AbstractName implements Name {
     }
 
     protected checkBounds(i: number): void {
-        if (i < 0 || i >= this.getNoComponents()) throw new Error("index out of bounds");
+        // if (i < 0 || i >= this.getNoComponents()) throw new Error("index out of bounds");
+    }
+
+    protected checkForUnescapedDelimiter(c: string): void {
+        if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new Error("String contains unescaped delimiter characters");
+    }
+
+    protected getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
+        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g');
     }
 
 }

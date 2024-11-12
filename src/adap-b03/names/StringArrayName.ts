@@ -44,11 +44,4 @@ export class StringArrayName extends AbstractName {
         this.components.splice(i, 1); // remove the i-th component
     }
 
-    private checkForUnescapedDelimiter(c: string): void {
-        if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new Error("String contains unescaped delimiter characters");
-    }
-
-    private getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
-        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g');
-    }
 }

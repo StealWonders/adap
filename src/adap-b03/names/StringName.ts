@@ -55,18 +55,4 @@ export class StringName extends AbstractName {
         this.noComponents--;
     }
 
-    private checkForUnescapedDelimiter(c: string): void {
-        if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new Error("String contains unescaped delimiter characters");
-    }
-
-    private getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
-        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g'); // todo: make this escape escape-characters
-        
-        // all not correctly escaped delimiters
-        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER})(?:\\\\\\\\)*[${this.delimiter}]`, 'g');
-        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER})(\\${ESCAPE_CHARACTER}\\${ESCAPE_CHARACTER})*[${this.delimiter}]`, 'g');
-        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER}|(?:\\${ESCAPE_CHARACTER}{2})*\\${ESCAPE_CHARACTER})[${delimiter}]`, 'g');    
-        // return new RegExp(`(?<=(^|[^\\${ESCAPE_CHARACTER}]|(?:\\${ESCAPE_CHARACTER}{2})+))[${delimiter}]`, 'g');
-    }   
-
 }
