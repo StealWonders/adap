@@ -6,7 +6,7 @@ export abstract class AbstractName implements Name {
     protected delimiter: string = DEFAULT_DELIMITER;
 
     constructor(delimiter: string = DEFAULT_DELIMITER) {
-        throw new Error("needs implementation");
+        this.delimiter = delimiter;
     }
 
     public clone(): Name {
@@ -34,11 +34,11 @@ export abstract class AbstractName implements Name {
     }
 
     public isEmpty(): boolean {
-        throw new Error("needs implementation");
+        return this.getNoComponents() === 0;
     }
 
     public getDelimiterCharacter(): string {
-        throw new Error("needs implementation");
+        return this.delimiter;
     }
 
     abstract getNoComponents(): number;
@@ -52,6 +52,10 @@ export abstract class AbstractName implements Name {
 
     public concat(other: Name): void {
         throw new Error("needs implementation");
+    }
+
+    protected checkBounds(i: number): void {
+        if (i < 0 || i >= this.getNoComponents()) throw new Error("index out of bounds");
     }
 
 }

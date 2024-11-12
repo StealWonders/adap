@@ -8,68 +8,65 @@ export class StringName extends AbstractName {
     protected noComponents: number = 0;
 
     constructor(other: string, delimiter?: string) {
-        super();
-        throw new Error("needs implementation");
+        if (other.length == 0) throw new Error("Name must have at least one component");
+        if (delimiter !== undefined) super(delimiter);
+        else super();
+        this.name = other;
+        this.noComponents = other.split(this.getUnescaptedDelimiterRegex(delimiter)).length; // count the number of components
     }
 
-    public clone(): Name {
-        throw new Error("needs implementation");
+    getNoComponents(): number {
+        return this.noComponents;
     }
 
-    public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation");
+    getComponent(i: number): string {
+        this.checkBounds(i);
+        return this.name.split(this.getUnescaptedDelimiterRegex())[i];
     }
 
-    public toString(): string {
-        throw new Error("needs implementation");
+    setComponent(i: number, newComponent: string) {
+        this.checkBounds(i);
+        this.checkForUnescapedDelimiter(newComponent);
+        const components = this.name.split(this.getUnescaptedDelimiterRegex());
+        components[i] = newComponent;
+        this.name = components.join(this.delimiter);
     }
 
-    public asDataString(): string {
-        throw new Error("needs implementation");
+    insert(i: number, newComponent: string) {
+        this.checkBounds(i);
+        this.checkForUnescapedDelimiter(newComponent);
+        const components = this.name.split(this.getUnescaptedDelimiterRegex());
+        components.splice(i, 0, newComponent);
+        this.name = components.join(this.delimiter);
+        this.noComponents++;
     }
 
-    public isEqual(other: Name): boolean {
-        throw new Error("needs implementation");
+    append(c: string) {
+        this.checkForUnescapedDelimiter(c);
+        this.name += this.delimiter + c;
+        this.noComponents++;
     }
 
-    public getHashCode(): number {
-        throw new Error("needs implementation");
+    remove(i: number) {
+        this.checkBounds(i);
+        const components = this.name.split(this.getUnescaptedDelimiterRegex());
+        components.splice(i, 1);
+        this.name = components.join(this.delimiter);
+        this.noComponents--;
     }
 
-    public isEmpty(): boolean {
-        throw new Error("needs implementation");
+    private checkForUnescapedDelimiter(c: string): void {
+        if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new Error("String contains unescaped delimiter characters");
     }
 
-    public getDelimiterCharacter(): string {
-        throw new Error("needs implementation");
-    }
-
-    public getNoComponents(): number {
-        throw new Error("needs implementation");
-    }
-
-    public getComponent(i: number): string {
-        throw new Error("needs implementation");
-    }
-
-    public setComponent(i: number, c: string) {
-        throw new Error("needs implementation");
-    }
-
-    public insert(i: number, c: string) {
-        throw new Error("needs implementation");
-    }
-
-    public append(c: string) {
-        throw new Error("needs implementation");
-    }
-
-    public remove(i: number) {
-        throw new Error("needs implementation");
-    }
-
-    public concat(other: Name): void {
-        throw new Error("needs implementation");
-    }
+    private getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
+        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g'); // todo: make this escape escape-characters
+        
+        // all not correctly escaped delimiters
+        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER})(?:\\\\\\\\)*[${this.delimiter}]`, 'g');
+        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER})(\\${ESCAPE_CHARACTER}\\${ESCAPE_CHARACTER})*[${this.delimiter}]`, 'g');
+        // return new RegExp(`(?<!\\${ESCAPE_CHARACTER}|(?:\\${ESCAPE_CHARACTER}{2})*\\${ESCAPE_CHARACTER})[${delimiter}]`, 'g');    
+        // return new RegExp(`(?<=(^|[^\\${ESCAPE_CHARACTER}]|(?:\\${ESCAPE_CHARACTER}{2})+))[${delimiter}]`, 'g');
+    }   
 
 }
