@@ -36,13 +36,8 @@ export abstract class AbstractName implements Name {
 
     // todo: escapted escape-characters are not handled correctly
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
-    public toString(delimiter: string = this.delimiter): string {
-        let result = "";
-        for (let i = 0; i < this.getNoComponents(); i++) {
-            result += this.getComponent(i);
-            if (i < this.getNoComponents() - 1) result += delimiter;
-        }
-        return result;
+    public toString(): string {
+        return this.asString(DEFAULT_DELIMITER); // don't know if this behavior is correct. Nothing was specified in the task
     }
 
     // todo: escapted escape-characters are not handled correctly
