@@ -37,33 +37,23 @@ export abstract class AbstractName implements Name {
     // todo: escapted escape-characters are not handled correctly
     // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public toString(): string {
-        return this.asString(DEFAULT_DELIMITER); // don't know if this behavior is correct. Nothing was specified in the task
+        return this.asDataString(); // don't know if this behavior is correct. Nothing was specified in the task
     }
 
     // todo: escapted escape-characters are not handled correctly
-    // join the components with the default delimiter so that the Name can be parsed back in from the string
+    // machine readable representation of the Name. Delimiters must be escaped within components
     public asDataString(): string {
-        if (this.delimiter === DEFAULT_DELIMITER) {  // If the delimiter is the default delimiter, no need to escape it
-            let result = "";
-            for (let i = 0; i < this.getNoComponents(); i++) {
-                result += this.getComponent(i);
-                if (i < this.getNoComponents() - 1) result += DEFAULT_DELIMITER;
-            }
-            return result;
-        }
-
-        // If the delimiter is not the default delimiter, escape the default delimiter
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
-            result += this.getComponent(i).replaceAll(ESCAPE_CHARACTER + this.delimiter, this.delimiter);
-            if (i < this.getNoComponents() - 1) result += DEFAULT_DELIMITER;
+            result += this.getComponent(i);
+            if (i < this.getNoComponents() - 1) result += this.delimiter;
         }
         return result;
     }
 
     public isEqual(other: Name): boolean {
-        if (this === other) return true;
-        if (other == null || this.constructor !== other.constructor) return false;
+        if (this === other) return true; // same object (reference equality)
+        if (other == null) return false;
 
         if (this.getDelimiterCharacter() !== other.getDelimiterCharacter()) return false;
         if (this.getNoComponents() !== other.getNoComponents()) return false;
@@ -77,8 +67,21 @@ export abstract class AbstractName implements Name {
         return true;
     }
 
+    // ref: https://www.baeldung.com/java-hashcode
     public getHashCode(): number {
-        return this.getHashCode();
+        let hash = 7; // start with a prime number
+        hash = 31 * hash  + this.delimiter.charCodeAt(0);
+        
+        // hash each component
+        for (let i = 0; i < this.getNoComponents(); i++) {
+            const component = this.getComponent(i);
+            for (let j = 0; j < component.length; j++) {
+                hash = 31 * hash + component.charCodeAt(j);
+            }
+            hash = hash * 31; // separator value to distinguish between different component boundaries
+        }
+        
+        return hash >>> 0; // keep the hash within 32-bit integer range
     }
 
     public clone(): Name {
@@ -110,7 +113,7 @@ export abstract class AbstractName implements Name {
     }
 
     protected checkBounds(i: number): void {
-        // if (i < 0 || i >= this.getNoComponents()) throw new Error("index out of bounds");
+        if (i < 0 || i >= this.getNoComponents()) throw new Error("index out of bounds");
     }
 
     protected checkForUnescapedDelimiter(c: string): void {
