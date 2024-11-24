@@ -19,13 +19,17 @@ export class File extends Node {
         
     }
 
+    // https://www.studon.fau.de/studon/ilias.php?ref_id=4447999&cmdClass=ilobjforumgui&thr_pk=387861&page=0&cmd=viewThread&cmdNode=13z:tp&baseClass=ilRepositoryGUI
+    // -> IllegalArgumentException and not IllegalStateException
     public open(): void {
-        InvalidStateException.assertCondition(this.doGetFileState() === FileState.CLOSED, "File is already open");
+        IllegalArgumentException.assertCondition(this.doGetFileState() === FileState.CLOSED, "File is already open");
         // do something
     }
 
+    // https://www.studon.fau.de/studon/ilias.php?ref_id=4447999&cmdClass=ilobjforumgui&thr_pk=387861&page=0&cmd=viewThread&cmdNode=13z:tp&baseClass=ilRepositoryGUI
+    // -> IllegalArgumentException and not IllegalStateException
     public close(): void {
-        InvalidStateException.assertCondition(this.doGetFileState() === FileState.OPEN, "File is already closed");
+        IllegalArgumentException.assertCondition(this.doGetFileState() === FileState.OPEN, "File is already closed");
         // do something
     }
 
