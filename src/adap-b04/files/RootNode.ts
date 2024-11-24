@@ -21,13 +21,15 @@ export class RootNode extends Directory {
         return new StringName("", '/');
     }
 
+    // https://www.studon.fau.de/studon/ilias.php?ref_id=4447999&cmdClass=ilobjforumgui&thr_pk=387861&page=0&cmd=viewThread&cmdNode=13z:tp&baseClass=ilRepositoryGUI
+    // -> IllegalArgumentException and not IllegalStateException
     public move(to: Directory): void {
-        InvalidStateException.assertCondition(false, "Root node cannot be moved");
+        IllegalArgumentException.assertCondition(false, "root node cannot be moved");
         // null operation
     }
 
     protected doSetBaseName(bn: string): void {
-        InvalidStateException.assertCondition(false, "Root node cannot be renamed");
+        IllegalArgumentException.assertIsNotNullOrUndefined(bn, "Base name must not be null or undefined");
         // null operation
     }
 
