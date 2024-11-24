@@ -11,7 +11,7 @@ export class StringArrayName extends AbstractName {
         IllegalArgumentException.assertCondition(other.every(c => c.length > 0), "components must have at least one character"); // pre-condition
         super(delimiter); // if undefined, the default delimiter is used
         this.components = other;
-        // todo: class-invariant
+        AbstractName.assertNameInvariant(this); // class-invariant
     }
 
     getNoComponents(): number {

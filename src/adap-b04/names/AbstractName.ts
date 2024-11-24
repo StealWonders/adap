@@ -1,4 +1,5 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
+import { InvalidStateException } from "../common/InvalidStateException";
 import { MethodFailureException } from "../common/MethodFailureException";
 import { DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "../common/Printable";
 import { Name } from "./Name";
@@ -8,15 +9,15 @@ export abstract class AbstractName implements Name {
     protected delimiter: string = DEFAULT_DELIMITER;
 
     constructor(delimiter: string = DEFAULT_DELIMITER) {
-        IllegalArgumentException.assertCondition(delimiter.length === 1, "delimiter must be a single character"); // pre-condition
+        this.preCheckDelimiterLength(delimiter); // pre-condition
         this.delimiter = delimiter;
-        // todo: post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
     }
 
-    // todo: escapted escape-characters are not handled correctly
-    // return a human-readable representation of the Name. If a component contains an escaped delimiter unescape it
     public asString(delimiter: string = this.delimiter): string {
-        IllegalArgumentException.assertCondition(delimiter.length === 1, "delimiter must be a single character"); // pre-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+        this.preCheckDelimiterLength(delimiter); // pre-condition
+
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
             result += this.getComponent(i)
@@ -24,29 +25,39 @@ export abstract class AbstractName implements Name {
                 .replaceAll(ESCAPE_CHARACTER + this.delimiter, this.delimiter); // Unescape the delimiter
             if (i < this.getNoComponents() - 1) result += delimiter;
         }
-        MethodFailureException.assertCondition(result.length > 0, "name must have at least one component"); // post-condition
+
+        this.postCheckComponentAmount(result.length); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
 
-    // todo: escapted escape-characters are not handled correctly
-    // machine readable representation of the Name. Delimiters must be escaped within components
     public toString(): string {
-        return this.asDataString(); // don't know if this behavior is correct. Nothing was specified in the task
+        AbstractName.assertNameInvariant(this); // class-invariant
+
+        const result = this.asDataString(); // don't know if this behavior is correct. Nothing was specified in the task
+
+        this.postCheckComponentAmount(result.length); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+        return result;
     }
 
-    // todo: escapted escape-characters are not handled correctly
-    // machine readable representation of the Name. Delimiters must be escaped within components
     public asDataString(): string {
+        AbstractName.assertNameInvariant(this); // class-invariant
+
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
             result += this.getComponent(i);
             if (i < this.getNoComponents() - 1) result += this.delimiter;
         }
-        MethodFailureException.assertCondition(result.length > 0, "name must have at least one component"); // post-condition
+
+        this.postCheckComponentAmount(result.length); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
 
     public isEqual(other: Name): boolean {
+        AbstractName.assertNameInvariant(this); // class-invariant
+
         if (this === other) return true; // same object (reference equality)
         if (other == null) return false;
 
@@ -55,15 +66,19 @@ export abstract class AbstractName implements Name {
 
         for (let i = 0; i < this.getNoComponents(); i++) {
             if (this.getComponent(i) !== other.getComponent(i)) {
+                AbstractName.assertNameInvariant(this); // class-invariant
                 return false;
             }
         }
 
+        AbstractName.assertNameInvariant(this); // class-invariant
         return true;
     }
 
     // ref: https://www.baeldung.com/java-hashcode
     public getHashCode(): number {
+        AbstractName.assertNameInvariant(this); // class-invariant
+
         let hash = 7; // start with a prime number
         hash = 31 * hash  + this.delimiter.charCodeAt(0);
         
@@ -75,24 +90,42 @@ export abstract class AbstractName implements Name {
             }
             hash = hash * 31; // separator value to distinguish between different component boundaries
         }
-        
-        return hash >>> 0; // keep the hash within 32-bit integer range
+
+        const result = hash >>> 0; // keep the hash within 32-bit integer range
+
+        AbstractName.assertNameInvariant(this); // class-invariant
+        return result;
     }
 
     public clone(): Name {
+        AbstractName.assertNameInvariant(this); // class-invariant
+
         const result = Object.create(this);
-        MethodFailureException.assertCondition(result !== null, "Object.create() failed"); // post-condition
+
+        MethodFailureException.assertIsNotNullOrUndefined(result, "Object.create() failed"); // post-condition
         MethodFailureException.assertCondition(this.isEqual(result), "clone() failed"); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
 
     public isEmpty(): boolean {
-        return this.getNoComponents() === 0;
+        AbstractName.assertNameInvariant(this); // class-invariant
+
+        const result = this.getNoComponents() === 0;
+
+        MethodFailureException.assertCondition(this.getNoComponents() === 0 || this.getNoComponents() > 0, "component amount must be positive or zero"); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+        return result;
     }
 
     public getDelimiterCharacter(): string {
-        MethodFailureException.assertCondition(this.delimiter.length === 1, "delimiter must be a single character"); // post-condition
-        return this.delimiter;
+        AbstractName.assertNameInvariant(this); // class-invariant
+
+        const result = this.delimiter;
+
+        this.postCheckDelimiterLength(result); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+        return result;
     }
 
     abstract getNoComponents(): number;
@@ -105,15 +138,33 @@ export abstract class AbstractName implements Name {
     abstract remove(i: number): void;
 
     public concat(other: Name): void {
-        IllegalArgumentException.assertCondition(other != null, "other must not be null"); // pre-condition
-        IllegalArgumentException.assertCondition(other.getNoComponents() > 0, "other must have at least one component"); // pre-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+
+        IllegalArgumentException.assertIsNotNullOrUndefined(other); // pre-condition
+        this.preCheckComponentAmount(other.getNoComponents()); // pre-condition
         IllegalArgumentException.assertCondition(this.delimiter === other.getDelimiterCharacter(), "delimiters do not match"); // pre-condition
+        const transaction = this.clone(); // save the current state for rollback
+
         for (let i = 0; i < other.getNoComponents(); i++) {
             this.append(other.getComponent(i));
         }
-        // todo: post-condition
+
+        MethodFailureException.assertConditionWithCallback(
+            () => {
+                Object.assign(this, transaction);
+            },
+            transaction.getNoComponents() + other.getNoComponents() === this.getNoComponents(),
+            "number of components do not add up correctly"
+        )
+        AbstractName.assertNameInvariant(this); // class-invariant
     }
 
+    // Helper Method
+    protected getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
+        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g');
+    }
+
+    // Pre- and Post-Conditions
     protected checkBounds(i: number): void {
         if (i < 0 || i >= this.getNoComponents()) throw new IllegalArgumentException("index out of bounds");
     }
@@ -122,8 +173,29 @@ export abstract class AbstractName implements Name {
         if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new IllegalArgumentException("string contains unescaped delimiter characters");
     }
 
-    protected getUnescaptedDelimiterRegex(delimiter: string = this.delimiter): RegExp {
-        return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g');
+    protected preCheckDelimiterLength(delimiter: string): void {
+        if (delimiter.length !== 1) throw new IllegalArgumentException("delimiter must be a single character");
+    }
+
+    protected postCheckDelimiterLength(delimiter: string): void {
+        if (delimiter.length !== 1) throw new MethodFailureException("delimiter must be a single character");
+    }
+
+    protected preCheckComponentAmount(amount: number): void {
+        if (amount < 0) throw new IllegalArgumentException("component amount must be positive");
+    }
+
+    protected postCheckComponentAmount(amount: number): void {
+        if (amount < 0) throw new MethodFailureException("component amount must be positive");
+    }
+
+    // Class Invariant
+    protected static instanceIsName(o: any): o is Name {
+        return o instanceof AbstractName; // todo: probably make this better
+    }
+
+    protected static assertNameInvariant(o: any) {
+        InvalidStateException.assertCondition(AbstractName.instanceIsName(o), "Name class-invariant violated");
     }
 
 }

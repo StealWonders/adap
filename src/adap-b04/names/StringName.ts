@@ -12,7 +12,7 @@ export class StringName extends AbstractName {
         super(delimiter); // if undefined, the default delimiter is used
         this.name = other;
         this.noComponents = other.split(this.getUnescaptedDelimiterRegex(delimiter)).length; // count the number of components
-        // todo: class-invariant
+        AbstractName.assertNameInvariant(this); // class-invariant
     }
 
     getNoComponents(): number {
