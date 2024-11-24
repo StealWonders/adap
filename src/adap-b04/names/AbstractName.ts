@@ -9,14 +9,14 @@ export abstract class AbstractName implements Name {
     protected delimiter: string = DEFAULT_DELIMITER;
 
     constructor(delimiter: string = DEFAULT_DELIMITER) {
-        this.preCheckDelimiterLength(delimiter); // pre-condition
+        AbstractName.preCheckDelimiterLength(delimiter); // pre-condition
         this.delimiter = delimiter;
         AbstractName.assertNameInvariant(this); // class-invariant
     }
 
     public asString(delimiter: string = this.delimiter): string {
         AbstractName.assertNameInvariant(this); // class-invariant
-        this.preCheckDelimiterLength(delimiter); // pre-condition
+        AbstractName.preCheckDelimiterLength(delimiter); // pre-condition
 
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
@@ -26,7 +26,7 @@ export abstract class AbstractName implements Name {
             if (i < this.getNoComponents() - 1) result += delimiter;
         }
 
-        this.postCheckComponentAmount(result.length); // post-condition
+        AbstractName.postCheckComponentAmount(result.length); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -36,7 +36,7 @@ export abstract class AbstractName implements Name {
 
         const result = this.asDataString(); // don't know if this behavior is correct. Nothing was specified in the task
 
-        this.postCheckComponentAmount(result.length); // post-condition
+        AbstractName.postCheckComponentAmount(result.length); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -50,7 +50,7 @@ export abstract class AbstractName implements Name {
             if (i < this.getNoComponents() - 1) result += this.delimiter;
         }
 
-        this.postCheckComponentAmount(result.length); // post-condition
+        AbstractName.postCheckComponentAmount(result.length); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -108,6 +108,12 @@ export abstract class AbstractName implements Name {
         return result;
     }
 
+    protected cloneWithPrototype<T>(obj: T): T {
+        const cloned = structuredClone(obj);
+        Object.setPrototypeOf(cloned, Object.getPrototypeOf(obj));
+        return cloned;
+    }
+
     public isEmpty(): boolean {
         AbstractName.assertNameInvariant(this); // class-invariant
 
@@ -123,7 +129,7 @@ export abstract class AbstractName implements Name {
 
         const result = this.delimiter;
 
-        this.postCheckDelimiterLength(result); // post-condition
+        AbstractName.postCheckDelimiterLength(result); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -141,9 +147,9 @@ export abstract class AbstractName implements Name {
         AbstractName.assertNameInvariant(this); // class-invariant
 
         IllegalArgumentException.assertIsNotNullOrUndefined(other); // pre-condition
-        this.preCheckComponentAmount(other.getNoComponents()); // pre-condition
+        AbstractName.preCheckComponentAmount(other.getNoComponents()); // pre-condition
         IllegalArgumentException.assertCondition(this.delimiter === other.getDelimiterCharacter(), "delimiters do not match"); // pre-condition
-        const transaction = this.clone(); // save the current state for rollback
+        const transaction = this.cloneWithPrototype(this); // save the current state for rollback
 
         for (let i = 0; i < other.getNoComponents(); i++) {
             this.append(other.getComponent(i));
@@ -164,7 +170,7 @@ export abstract class AbstractName implements Name {
         return new RegExp(`(?<!\\${ESCAPE_CHARACTER})[${this.delimiter}]`, 'g');
     }
 
-    // Pre- and Post-Conditions
+    // Class-bound Conditions
     protected checkBounds(i: number): void {
         if (i < 0 || i >= this.getNoComponents()) throw new IllegalArgumentException("index out of bounds");
     }
@@ -173,19 +179,20 @@ export abstract class AbstractName implements Name {
         if (c.includes(this.getUnescaptedDelimiterRegex().toString())) throw new IllegalArgumentException("string contains unescaped delimiter characters");
     }
 
-    protected preCheckDelimiterLength(delimiter: string): void {
+    // Pre- and Post-Conditions
+    protected static preCheckDelimiterLength(delimiter: string): void {
         if (delimiter.length !== 1) throw new IllegalArgumentException("delimiter must be a single character");
     }
 
-    protected postCheckDelimiterLength(delimiter: string): void {
+    protected static postCheckDelimiterLength(delimiter: string): void {
         if (delimiter.length !== 1) throw new MethodFailureException("delimiter must be a single character");
     }
 
-    protected preCheckComponentAmount(amount: number): void {
+    protected static preCheckComponentAmount(amount: number): void {
         if (amount < 0) throw new IllegalArgumentException("component amount must be positive");
     }
 
-    protected postCheckComponentAmount(amount: number): void {
+    protected static postCheckComponentAmount(amount: number): void {
         if (amount < 0) throw new MethodFailureException("component amount must be positive");
     }
 
