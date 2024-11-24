@@ -47,7 +47,7 @@ export abstract class AbstractName implements Name {
         let result = "";
         for (let i = 0; i < this.getNoComponents(); i++) {
             result += this.getComponent(i);
-            if (i < this.getNoComponents() - 1) result += this.delimiter;
+            if (i < this.getNoComponents() - 1) result += DEFAULT_DELIMITER;
         }
 
         AbstractName.postCheckComponentAmount(result.length); // post-condition
