@@ -12,11 +12,13 @@ export class Directory extends Node {
     public add(cn: Node): void {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, !this.childNodes.has(cn), "Directory already contains node");
         this.childNodes.add(cn);
+        this.assertClassInvariants();
     }
 
     public remove(cn: Node): void {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.childNodes.has(cn), "Directory does not contain node");
         this.childNodes.delete(cn); // Yikes! Should have been called remove
+        this.assertClassInvariants();
     }
 
 }

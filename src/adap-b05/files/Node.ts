@@ -11,9 +11,11 @@ export class Node {
     protected parentNode: Directory;
 
     constructor(bn: string, pn: Directory) {
+        this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
         this.doSetBaseName(bn);
         this.parentNode = pn; // why oh why do I have to set this
         this.initialize(pn);
+        this.assertClassInvariants();
     }
 
     protected initialize(pn: Directory): void {
@@ -26,6 +28,7 @@ export class Node {
         this.parentNode.remove(this);
         to.add(this);
         this.parentNode = to;
+        this.assertClassInvariants();
     }
 
     public getFullName(): Name {
@@ -46,7 +49,9 @@ export class Node {
 
     public rename(bn: string): void {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
+        this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
         this.doSetBaseName(bn);
+        this.assertClassInvariants();
     }
 
     protected doSetBaseName(bn: string): void {

@@ -21,6 +21,7 @@ export class File extends Node {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state === FileState.CLOSED, "File already open");
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.DELETED, "File is deleted, cannot open");
         // do something
+        this.assertClassInvariants();
     }
 
     public read(noBytes: number): Int8Array {
@@ -51,6 +52,7 @@ export class File extends Node {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state === FileState.OPEN, "File not open");
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.DELETED, "File is deleted, cannot close");
         // do something
+        this.assertClassInvariants();
     }
 
     protected doGetFileState(): FileState {

@@ -31,7 +31,7 @@ export class RootNode extends Directory {
     }
 
     protected doSetBaseName(bn: string): void {
-        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, false, "Root node cannot be renamed");
+        this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
         // null operation
     }
 

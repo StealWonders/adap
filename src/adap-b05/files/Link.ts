@@ -12,6 +12,8 @@ export class Link extends Node {
         if (tn != undefined) {
             this.targetNode = tn;
         }
+
+        this.assertClassInvariants();
     }
 
     public getTargetNode(): Node | null {
@@ -22,6 +24,7 @@ export class Link extends Node {
     public setTargetNode(target: Node): void {
         // no pre-condition required
         this.targetNode = target;
+        this.assertClassInvariants();
     }
 
     public getBaseName(): string {
@@ -33,10 +36,11 @@ export class Link extends Node {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
         const target = this.ensureTargetNode(this.targetNode);
         target.rename(bn);
+        this.assertClassInvariants();
     }
 
     protected ensureTargetNode(target: Node | null): Node {
-        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, target !== null, "Target node must not be null"); // todo: check if this is correct!!!!!
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, target !== null && target != undefined, "Target node must not be null or undefined"); // todo: check if this is correct!!!!!
         const result: Node = this.targetNode as Node;
         return result;
     }
