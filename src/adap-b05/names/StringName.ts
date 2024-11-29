@@ -1,5 +1,5 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { AbstractName } from "./AbstractName";
 
 export class StringName extends AbstractName {
@@ -33,8 +33,8 @@ export class StringName extends AbstractName {
 
         const result = this.name.split(this.getUnescaptedDelimiterRegex())[i];
 
-        MethodFailureException.assertIsNotNullOrUndefined(result); // post-condition
-        MethodFailureException.assertCondition(result.length > 0, "components must have at least one character"); // post-condition
+        MethodFailedException.assertIsNotNullOrUndefined(result); // post-condition
+        MethodFailedException.assertCondition(result.length > 0, "components must have at least one character"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -52,7 +52,7 @@ export class StringName extends AbstractName {
         components[i] = newComponent;
         this.name = components.join(this.delimiter);
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -76,14 +76,14 @@ export class StringName extends AbstractName {
         this.name = components.join(this.delimiter);
         this.noComponents++;
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
             this.getComponent(i) === newComponent,
             "component insertion did not work"
         ); // post-condition
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -105,14 +105,14 @@ export class StringName extends AbstractName {
         this.name += this.delimiter + c;
         this.noComponents++;
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
             this.getComponent(this.getNoComponents() - 1) === c,
             "component insertion did not work"
         ); // post-condition
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -133,7 +133,7 @@ export class StringName extends AbstractName {
         this.name = components.join(this.delimiter);
         this.noComponents--;
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },

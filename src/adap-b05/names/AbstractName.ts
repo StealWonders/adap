@@ -1,6 +1,6 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 import { InvalidStateException } from "../common/InvalidStateException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "../common/Printable";
 import { Name } from "./Name";
 
@@ -102,8 +102,8 @@ export abstract class AbstractName implements Name {
 
         const result = Object.create(this);
 
-        MethodFailureException.assertIsNotNullOrUndefined(result, "Object.create() failed"); // post-condition
-        MethodFailureException.assertCondition(this.isEqual(result), "clone() failed"); // post-condition
+        MethodFailedException.assertIsNotNullOrUndefined(result, "Object.create() failed"); // post-condition
+        MethodFailedException.assertCondition(this.isEqual(result), "clone() failed"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -119,7 +119,7 @@ export abstract class AbstractName implements Name {
 
         const result = this.getNoComponents() === 0;
 
-        MethodFailureException.assertCondition(this.getNoComponents() === 0 || this.getNoComponents() > 0, "component amount must be positive or zero"); // post-condition
+        MethodFailedException.assertCondition(this.getNoComponents() === 0 || this.getNoComponents() > 0, "component amount must be positive or zero"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -155,7 +155,7 @@ export abstract class AbstractName implements Name {
             this.append(other.getComponent(i));
         }
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -185,7 +185,7 @@ export abstract class AbstractName implements Name {
     }
 
     protected static postCheckDelimiterLength(delimiter: string): void {
-        if (delimiter.length !== 1) throw new MethodFailureException("delimiter must be a single character");
+        if (delimiter.length !== 1) throw new MethodFailedException("delimiter must be a single character");
     }
 
     protected static preCheckComponentAmount(amount: number): void {
@@ -193,7 +193,7 @@ export abstract class AbstractName implements Name {
     }
 
     protected static postCheckComponentAmount(amount: number): void {
-        if (amount < 0) throw new MethodFailureException("component amount must be positive");
+        if (amount < 0) throw new MethodFailedException("component amount must be positive");
     }
 
     // Class Invariant

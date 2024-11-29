@@ -1,5 +1,5 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { AbstractName } from "./AbstractName";
 
 export class StringArrayName extends AbstractName {
@@ -32,8 +32,8 @@ export class StringArrayName extends AbstractName {
 
         const result = this.components[i];
 
-        MethodFailureException.assertIsNotNullOrUndefined(result); // post-condition
-        MethodFailureException.assertCondition(result.length > 0, "components must have at least one character"); // post-condition
+        MethodFailedException.assertIsNotNullOrUndefined(result); // post-condition
+        MethodFailedException.assertCondition(result.length > 0, "components must have at least one character"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }
@@ -49,7 +49,7 @@ export class StringArrayName extends AbstractName {
         
         this.components[i] = c;
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -70,14 +70,14 @@ export class StringArrayName extends AbstractName {
         
         this.components.splice(i, 0, c); // insert the component at the i-th position and push the rest back
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
             this.getComponent(i) === c,
             "component insertion did not work"
         ); // post-condition
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -98,14 +98,14 @@ export class StringArrayName extends AbstractName {
         
         this.components.push(c); // append the component at the end
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
             this.getComponent(this.getNoComponents() - 1) === c,
             "component insertion did not work"
         ); // post-condition
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
@@ -122,7 +122,7 @@ export class StringArrayName extends AbstractName {
         
         this.components.splice(i, 1); // remove the i-th component
 
-        MethodFailureException.assertConditionWithCallback(
+        MethodFailedException.assertConditionWithCallback(
             () => {
                 Object.assign(this, transaction);
             },
