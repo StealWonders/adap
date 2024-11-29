@@ -1,6 +1,7 @@
 import { Node } from "./Node";
 import { Directory } from "./Directory";
 import { MethodFailedException } from "../common/MethodFailedException";
+import { AssertionDispatcher, ExceptionType } from "../common/AssertionDispatcher";
 
 enum FileState {
     OPEN,
@@ -17,10 +18,13 @@ export class File extends Node {
     }
 
     public open(): void {
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state === FileState.CLOSED, "File already open");
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.DELETED, "File is deleted, cannot open");
         // do something
     }
 
     public read(noBytes: number): Int8Array {
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.OPEN, "File not open");
         let result: Int8Array = new Int8Array(noBytes);
         // do something
 
@@ -44,6 +48,8 @@ export class File extends Node {
     }
 
     public close(): void {
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state === FileState.OPEN, "File not open");
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.DELETED, "File is deleted, cannot close");
         // do something
     }
 

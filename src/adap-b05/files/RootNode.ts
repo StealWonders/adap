@@ -9,6 +9,7 @@ export class RootNode extends Directory {
     protected static ROOT_NODE: RootNode = new RootNode();
 
     public static getRootNode() {
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.ROOT_NODE != null, "Root node must not be null");
         return this.ROOT_NODE;
     }
 
@@ -21,14 +22,16 @@ export class RootNode extends Directory {
     }
 
     public getFullName(): Name {
-        return new StringName("", '/');
+        return new StringName("", '/'); // no pre-condition required
     }
 
     public move(to: Directory): void {
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, false, "Root node cannot be moved");
         // null operation
     }
 
     protected doSetBaseName(bn: string): void {
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, false, "Root node cannot be renamed");
         // null operation
     }
 
