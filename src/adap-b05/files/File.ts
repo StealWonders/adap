@@ -15,9 +15,11 @@ export class File extends Node {
 
     constructor(baseName: string, parent: Directory) {
         super(baseName, parent);
+        this.assertClassInvariants();
     }
 
     public open(): void {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state === FileState.CLOSED, "File already open");
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.DELETED, "File is deleted, cannot open");
         // do something
@@ -25,6 +27,7 @@ export class File extends Node {
     }
 
     public read(noBytes: number): Int8Array {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.OPEN, "File not open");
         let result: Int8Array = new Int8Array(noBytes);
         // do something
@@ -49,6 +52,7 @@ export class File extends Node {
     }
 
     public close(): void {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state === FileState.OPEN, "File not open");
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.state !== FileState.DELETED, "File is deleted, cannot close");
         // do something

@@ -24,6 +24,7 @@ export class Node {
     }
 
     public move(to: Directory): void {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, to != null, "Target directory must not be null");
         this.parentNode.remove(this);
         to.add(this);
@@ -32,6 +33,7 @@ export class Node {
     }
 
     public getFullName(): Name {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.parentNode != null, "Parent node must not be null");
         const result: Name = this.parentNode.getFullName();
         result.append(this.getBaseName());
@@ -39,6 +41,7 @@ export class Node {
     }
 
     public getBaseName(): string {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.baseName != null, "Base name must not be null");
         return this.doGetBaseName();
     }
@@ -48,6 +51,7 @@ export class Node {
     }
 
     public rename(bn: string): void {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
         this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
         this.doSetBaseName(bn);
@@ -59,6 +63,7 @@ export class Node {
     }
 
     public getParentNode(): Directory {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, this.parentNode != null, "Parent node must not be null");
         return this.parentNode;
     }
@@ -68,8 +73,13 @@ export class Node {
      * @param bn basename of node being searched for
      */
     public findNodes(bn: string): Set<Node> {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
-        throw new Error("needs implementation or deletion");
+        const nodesFound: Set<Node> = new Set<Node>();
+        if (this.getBaseName() === bn) {
+            nodesFound.add(this);
+        }
+        return nodesFound;
     }
 
     protected assertClassInvariants(): void {

@@ -15,6 +15,7 @@ export class RootNode extends Directory {
 
     constructor() {
         super("", new Object as Directory);
+        this.assertClassInvariants();
     }
 
     protected initialize(pn: Directory): void {
@@ -22,10 +23,12 @@ export class RootNode extends Directory {
     }
 
     public getFullName(): Name {
+        this.assertClassInvariants();
         return new StringName("", '/'); // no pre-condition required
     }
 
     public move(to: Directory): void {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, false, "Root node cannot be moved");
         // null operation
     }

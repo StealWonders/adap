@@ -17,22 +17,24 @@ export class Link extends Node {
     }
 
     public getTargetNode(): Node | null {
-        // no pre-condition required
+        this.assertClassInvariants();
         return this.targetNode;
     }
 
     public setTargetNode(target: Node): void {
-        // no pre-condition required
+        this.assertClassInvariants();
         this.targetNode = target;
         this.assertClassInvariants();
     }
 
     public getBaseName(): string {
+        this.assertClassInvariants();
         const target = this.ensureTargetNode(this.targetNode); // todo: is this the pre-condition????
         return target.getBaseName();
     }
 
     public rename(bn: string): void {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
         const target = this.ensureTargetNode(this.targetNode);
         target.rename(bn);
@@ -40,6 +42,7 @@ export class Link extends Node {
     }
 
     protected ensureTargetNode(target: Node | null): Node {
+        this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, target !== null && target != undefined, "Target node must not be null or undefined"); // todo: check if this is correct!!!!!
         const result: Node = this.targetNode as Node;
         return result;
