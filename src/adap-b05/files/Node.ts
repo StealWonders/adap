@@ -1,6 +1,4 @@
 import { ExceptionType, AssertionDispatcher } from "../common/AssertionDispatcher";
-import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { InvalidStateException } from "../common/InvalidStateException";
 
 import { Name } from "../names/Name";
 import { Directory } from "./Directory";
@@ -75,11 +73,22 @@ export class Node {
     public findNodes(bn: string): Set<Node> {
         this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
-        const nodesFound: Set<Node> = new Set<Node>();
-        if (this.getBaseName() === bn) {
-            nodesFound.add(this);
+        
+        const result: Set<Node> = new Set<Node>();
+        if (this.getBaseName() === bn) result.add(this); // node searched for is the this node
+
+        // search for files in directory recursively
+        if (this instanceof Directory) {
+            const dir: Directory = this as Directory;
+            dir.getChildren().forEach((child: Node) => {
+                const childResult: Set<Node> = child.findNodes(bn);
+                childResult.forEach((node: Node) => {
+                    result.add(node);
+                });
+            });
         }
-        return nodesFound;
+
+        return result;
     }
 
     protected assertClassInvariants(): void {

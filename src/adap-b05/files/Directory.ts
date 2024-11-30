@@ -24,4 +24,9 @@ export class Directory extends Node {
         this.assertClassInvariants();
     }
 
+    public getChildren(): Set<Node> {
+        this.assertClassInvariants();
+        return this.childNodes;
+    }
+
 }
