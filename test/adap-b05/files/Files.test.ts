@@ -7,7 +7,7 @@ import { Node } from "../../../src/adap-b05/files/Node";
 import { File } from "../../../src/adap-b05/files/File";
 import { BuggyFile } from "../../../src/adap-b05/files/BuggyFile";
 import { Directory } from "../../../src/adap-b05/files/Directory";
-import { Exception } from "../common/Exception";
+import { Exception } from "../../../src/adap-b05/common/Exception";
 import { ServiceFailureException } from "../../../src/adap-b05/common/ServiceFailureException";
 import { InvalidStateException } from "../../../src/adap-b05/common/InvalidStateException";
 

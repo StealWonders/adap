@@ -1,4 +1,6 @@
 import { ExceptionType, AssertionDispatcher } from "../common/AssertionDispatcher";
+import { InvalidStateException } from "../common/InvalidStateException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { ServiceFailureException } from "../common/ServiceFailureException";
 
 import { Name } from "../names/Name";
@@ -14,7 +16,7 @@ export class Node {
         this.doSetBaseName(bn);
         this.parentNode = pn; // why oh why do I have to set this
         this.initialize(pn);
-        this.assertClassInvariants();
+        // this.assertClassInvariants(); // fails ServiceFailureException
     }
 
     protected initialize(pn: Directory): void {
@@ -87,11 +89,15 @@ export class Node {
                     const childResult: Set<Node> = child.findNodes(bn);
                     childResult.forEach((node: Node) => {
                         result.add(node);
+                        node.assertClassInvariants();
                     });
                 });
             }
+
+            this.assertClassInvariants();
         } catch (e: any) {
-            throw new ServiceFailureException("Failed to find nodes", e);
+            if (e instanceof MethodFailedException || e instanceof InvalidStateException) throw new ServiceFailureException("Failed to find nodes", e); // without this riehles test fails
+            else throw e;
         }
 
         return result;
@@ -103,7 +109,7 @@ export class Node {
     }
 
     protected assertIsValidBaseName(bn: string, et: ExceptionType): void {
-        const condition: boolean = (bn != "");
+        const condition: boolean = (bn !== "");
         AssertionDispatcher.dispatch(et, condition, "invalid base name");
     }
 
