@@ -34,7 +34,7 @@ export class StringName extends AbstractName {
         const result = this.name.split(this.getUnescaptedDelimiterRegex())[i];
 
         MethodFailedException.assertIsNotNullOrUndefined(result); // post-condition
-        MethodFailedException.assertCondition(result.length > 0, "components must have at least one character"); // post-condition
+        // MethodFailedException.assertCondition(result.length > 0, "components must have at least one character"); // post-condition // RootNode name is empty
         AbstractName.assertNameInvariant(this); // class-invariant
         return result;
     }

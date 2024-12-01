@@ -1,4 +1,5 @@
 import { ExceptionType, AssertionDispatcher } from "../common/AssertionDispatcher";
+import { ServiceFailureException } from "../common/ServiceFailureException";
 
 import { Name } from "../names/Name";
 import { Directory } from "./Directory";
@@ -75,17 +76,21 @@ export class Node {
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
         
         const result: Set<Node> = new Set<Node>();
-        if (this.getBaseName() === bn) result.add(this); // node searched for is the this node
+        try {
+            if (this.getBaseName() === bn) result.add(this); // node searched for is the this node
 
-        // search for files in directory recursively
-        if (this instanceof Directory) {
-            const dir: Directory = this as Directory;
-            dir.getChildren().forEach((child: Node) => {
-                const childResult: Set<Node> = child.findNodes(bn);
-                childResult.forEach((node: Node) => {
-                    result.add(node);
+            // search for files in directory recursively
+            if (this instanceof Directory) {
+                const dir: Directory = this as Directory;
+                dir.getChildren().forEach((child: Node) => {
+                    const childResult: Set<Node> = child.findNodes(bn);
+                    childResult.forEach((node: Node) => {
+                        result.add(node);
+                    });
                 });
-            });
+            }
+        } catch (e: any) {
+            throw new ServiceFailureException("Failed to find nodes", e);
         }
 
         return result;
