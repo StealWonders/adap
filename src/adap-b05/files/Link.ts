@@ -23,6 +23,7 @@ export class Link extends Node {
 
     public setTargetNode(target: Node): void {
         this.assertClassInvariants();
+        this.ensureTargetNode(target);
         this.targetNode = target;
         this.assertClassInvariants();
     }

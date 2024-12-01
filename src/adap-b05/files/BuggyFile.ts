@@ -5,7 +5,7 @@ export class BuggyFile extends File {
 
     constructor(baseName: string, parent: Directory) {
         super(baseName, parent);
-        this.assertClassInvariants();
+        // this.assertClassInvariants();
     }
 
     /**
@@ -13,7 +13,7 @@ export class BuggyFile extends File {
      * @returns base name, here always ""
      */
     protected doGetBaseName(): string {
-        this.assertClassInvariants();
+        // this.assertClassInvariants();
         this.baseName = "";
         return super.doGetBaseName();
     }

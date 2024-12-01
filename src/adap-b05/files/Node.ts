@@ -74,6 +74,7 @@ export class Node {
     public findNodes(bn: string): Set<Node> {
         this.assertClassInvariants();
         AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn !== null && bn != undefined, "Base name must not be null or undefined");
+        AssertionDispatcher.dispatch(ExceptionType.PRECONDITION, bn.length > 0, "Base name must not be empty");
         
         const result: Set<Node> = new Set<Node>();
         try {
