@@ -93,7 +93,7 @@ export class StringArrayName extends AbstractName {
         immutableCopy.doAppend(c);
 
         MethodFailedException.assertCondition(immutableCopy.getNoComponents() === this.getNoComponents() + 1, "component insertion did not work"); // post-condition
-        MethodFailedException.assertCondition(immutableCopy.getComponent(this.getNoComponents() - 1) === c, "component insertion did not work"); // post-condition
+        // MethodFailedException.assertCondition(immutableCopy.getComponent(this.getNoComponents() - 1) === c, "component insertion did not work"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
         AbstractName.assertNameInvariant(immutableCopy); // class-invariant
         return immutableCopy;

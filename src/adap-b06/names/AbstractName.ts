@@ -152,7 +152,7 @@ export abstract class AbstractName implements Name {
 
         let concatinated: Name = this; // dummy start-value
         for (let i = 0; i < other.getNoComponents(); i++) {
-            concatinated = this.append(other.getComponent(i));
+            concatinated = concatinated.append(other.getComponent(i));
         }
 
         MethodFailedException.assertCondition(this.getNoComponents() + other.getNoComponents() === concatinated.getNoComponents(), "number of components do not add up correctly"); // post-condition
