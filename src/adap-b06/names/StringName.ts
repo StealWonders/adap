@@ -1,6 +1,7 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 import { MethodFailedException } from "../common/MethodFailedException";
 import { AbstractName } from "./AbstractName";
+import { Name } from "./Name";
 
 export class StringName extends AbstractName {
 
@@ -17,7 +18,7 @@ export class StringName extends AbstractName {
         AbstractName.assertNameInvariant(this); // class-invariant
     }
 
-    getNoComponents(): number {
+    public getNoComponents(): number {
         AbstractName.assertNameInvariant(this); // class-invariant
         
         const result = this.noComponents;
@@ -27,7 +28,7 @@ export class StringName extends AbstractName {
         return result;
     }
 
-    getComponent(i: number): string {
+    public getComponent(i: number): string {
         AbstractName.assertNameInvariant(this); // class-invariant
         this.checkBounds(i); // pre-condition
 
@@ -39,108 +40,91 @@ export class StringName extends AbstractName {
         return result;
     }
 
-    setComponent(i: number, newComponent: string) {
-        AbstractName.assertNameInvariant(this); // class-invariant
+    private doSetComponent(i: number, newComponent: string): void {
+        const components = this.name.split(this.getUnescaptedDelimiterRegex());
+        components[i] = newComponent;
+        this.name = components.join(this.delimiter);
+    }
 
+    public setComponent(i: number, newComponent: string): StringName {
+        AbstractName.assertNameInvariant(this); // class-invariant
         this.checkBounds(i); // pre-condition
         IllegalArgumentException.assertIsNotNullOrUndefined(newComponent); // pre-condition
         IllegalArgumentException.assertCondition(newComponent.length > 0, "components must have at least one character"); // pre-condition
         this.checkForUnescapedDelimiter(newComponent); // pre-condition
-        const transaction = this.cloneWithPrototype(this); // save the current state for a potential rollback
-        
-        const components = this.name.split(this.getUnescaptedDelimiterRegex());
-        components[i] = newComponent;
-        this.name = components.join(this.delimiter);
 
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            this.getComponent(i) === newComponent,
-            "component assignment did not work"
-        ); // post-condition
+        const immutableCopy: StringName = this.cloneWithPrototype(this); // this should not be changed so we return a new instance with the changes
+        immutableCopy.doSetComponent(i, newComponent);
+
+        MethodFailedException.assertCondition(immutableCopy.getComponent(i) === newComponent, "component assignment did not work"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
+        AbstractName.assertNameInvariant(immutableCopy); // class-invariant
+        return immutableCopy;
     }
 
-    insert(i: number, newComponent: string) {
-        AbstractName.assertNameInvariant(this); // class-invariant
-
-        this.checkBounds(i);
-        IllegalArgumentException.assertIsNotNullOrUndefined(newComponent);
-        IllegalArgumentException.assertCondition(newComponent.length > 0, "components must have at least one character");
-        this.checkForUnescapedDelimiter(newComponent);
-        const transaction = this.cloneWithPrototype(this); // save the current state for a potential rollback
-        
+    private doInsert(i: number, newComponent: string): void {
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components.splice(i, 0, newComponent);
         this.name = components.join(this.delimiter);
         this.noComponents++;
-
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            this.getComponent(i) === newComponent,
-            "component insertion did not work"
-        ); // post-condition
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            this.getNoComponents() === transaction.getNoComponents() + 1,
-            "component insertion did not work"
-        ); // post-condition
-
-        AbstractName.assertNameInvariant(this); // class-invariant
     }
 
-    append(c: string) {
+    public insert(i: number, newComponent: string): StringName {
         AbstractName.assertNameInvariant(this); // class-invariant
+        this.checkBounds(i);
+        IllegalArgumentException.assertIsNotNullOrUndefined(newComponent);
+        IllegalArgumentException.assertCondition(newComponent.length > 0, "components must have at least one character");
+        this.checkForUnescapedDelimiter(newComponent);
+        
+        const immutableCopy = this.cloneWithPrototype(this); // this should not be changed so we return a new instance with the changes
+        immutableCopy.doInsert(i, newComponent);
 
+        MethodFailedException.assertCondition(immutableCopy.getNoComponents() === this.getNoComponents() + 1, "component insertion did not work"); // post-condition
+        MethodFailedException.assertCondition(immutableCopy.getComponent(i) === newComponent, "component insertion did not work"); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+        AbstractName.assertNameInvariant(immutableCopy); // class-invariant
+        return immutableCopy;
+    }
+
+    private doAppend(newComponent: string): void {
+        this.name += this.delimiter + newComponent;
+        this.noComponents++;
+    }
+
+    public append(c: string): StringName {
+        AbstractName.assertNameInvariant(this); // class-invariant
         IllegalArgumentException.assertIsNotNullOrUndefined(c);
         IllegalArgumentException.assertCondition(c.length > 0, "components must have at least one character");
         this.checkForUnescapedDelimiter(c); // pre-condition
-        const transaction = this.cloneWithPrototype(this); // save the current state for a potential rollback
         
-        this.name += this.delimiter + c;
-        this.noComponents++;
+        const immutableCopy = this.cloneWithPrototype(this); // this should not be changed so we return a new instance with the changes
+        immutableCopy.doAppend(c);
 
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            this.getComponent(this.getNoComponents() - 1) === c,
-            "component insertion did not work"
-        ); // post-condition
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            this.getNoComponents() === transaction.getNoComponents() + 1,
-            "component insertion did not work"
-        ); // post-condition
-
+        MethodFailedException.assertCondition(immutableCopy.getNoComponents() === this.getNoComponents() + 1, "component insertion did not work"); // post-condition
+        MethodFailedException.assertCondition(immutableCopy.getComponent(this.getNoComponents() - 1) === c, "component insertion did not work"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
+        AbstractName.assertNameInvariant(immutableCopy); // class-invariant
+        return immutableCopy;
     }
 
-    remove(i: number) {
-        AbstractName.assertNameInvariant(this); // class-invariant
-        this.checkBounds(i); // pre-condition
-        const transaction = this.cloneWithPrototype(this); // save the current state for a potential rollback
-
+    private doRemove(i: number): void {
         const components = this.name.split(this.getUnescaptedDelimiterRegex());
         components.splice(i, 1);
         this.name = components.join(this.delimiter);
         this.noComponents--;
+    }
 
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            this.getNoComponents() === transaction.getNoComponents() - 1,
-            "component insertion did not work"
-        ); // post-condition
+    public remove(i: number): StringName {
         AbstractName.assertNameInvariant(this); // class-invariant
+        this.checkBounds(i); // pre-condition
+        
+        const immutableCopy = this.cloneWithPrototype(this); // this should not be changed so we return a new instance with the changes
+        immutableCopy.doRemove(i);
+
+        MethodFailedException.assertCondition(immutableCopy.getNoComponents() === this.getNoComponents() - 1, "component removal did not work"); // post-condition
+        AbstractName.assertNameInvariant(this); // class-invariant
+        AbstractName.assertNameInvariant(immutableCopy); // class-invariant
+        return immutableCopy;
     }
 
 }

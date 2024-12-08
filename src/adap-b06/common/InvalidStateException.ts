@@ -13,5 +13,15 @@ export class InvalidStateException extends Exception {
     constructor(m: string, t?: Exception) {
         super(m, t);
     }
+
+    // too lazy to change all the calls that used to rely on this method
+    public static assertIsNotNullOrUndefined(o: any, m: string = "object must not be null or undefined"): void {
+        InvalidStateException.assert(o !== null && o !== undefined, m);
+    }
+
+    // too lazy to change all the calls that used to rely on this method
+    public static assertCondition(c: boolean, m: string = "condition failed"): void {
+        InvalidStateException.assert(c, m);
+    }
     
 }

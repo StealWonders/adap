@@ -137,32 +137,27 @@ export abstract class AbstractName implements Name {
     abstract getNoComponents(): number;
 
     abstract getComponent(i: number): string;
-    abstract setComponent(i: number, c: string): void;
+    abstract setComponent(i: number, c: string): Name;
 
-    abstract insert(i: number, c: string): void;
-    abstract append(c: string): void;
-    abstract remove(i: number): void;
+    abstract insert(i: number, c: string): Name;
+    abstract append(c: string): Name;
+    abstract remove(i: number): Name;
 
-    public concat(other: Name): void {
+    public concat(other: Name): Name {
         AbstractName.assertNameInvariant(this); // class-invariant
 
         IllegalArgumentException.assertIsNotNullOrUndefined(other); // pre-condition
         AbstractName.preCheckComponentAmount(other.getNoComponents()); // pre-condition
         IllegalArgumentException.assertCondition(this.delimiter === other.getDelimiterCharacter(), "delimiters do not match"); // pre-condition
-        const transaction = this.cloneWithPrototype(this); // save the current state for rollback
 
+        let concatinated: Name = this; // dummy start-value
         for (let i = 0; i < other.getNoComponents(); i++) {
-            this.append(other.getComponent(i));
+            concatinated = this.append(other.getComponent(i));
         }
 
-        MethodFailedException.assertConditionWithCallback(
-            () => {
-                Object.assign(this, transaction);
-            },
-            transaction.getNoComponents() + other.getNoComponents() === this.getNoComponents(),
-            "number of components do not add up correctly"
-        )
+        MethodFailedException.assertCondition(this.getNoComponents() + other.getNoComponents() === concatinated.getNoComponents(), "number of components do not add up correctly"); // post-condition
         AbstractName.assertNameInvariant(this); // class-invariant
+        return concatinated;
     }
 
     // Helper Method
